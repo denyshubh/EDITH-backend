@@ -1,20 +1,18 @@
 const { Sequelize, sequelize } = require('../startup/db')
 // Sequalize Operator Comparision
 const Op = Sequelize.Op
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
-const config = require("../config/config")
 
-const User = sequelize.define('user', {
-    user_id: {
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+const Location = sequelize.define("location", {
+    location_id: {
         primaryKey: true,
         type: Sequelize.UUID,
 
     },
-    name: Sequelize.STRING(30),
-    email: { type: Sequelize.STRING(50), isEmail: true, },
-    token: Sequelize.STRING(1000),
-    is_admin: Sequelize.INTEGER
+    location: Sequelize.STRING(100)
 }, {
     timestamps: false,
     underscored: true,
@@ -51,38 +49,4 @@ const User = sequelize.define('user', {
     // }
 })
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-
-
-User.prototype.generateAuthToken = function() {
-    const token = jwt.sign({
-            user_id: this.user_id,
-            name: this.name,
-            email: this.email,
-            is_admin: this.is_admin
-        },
-        config["secret"].jwtPrivateKey
-    );
-    return token;
-};
-
-User.findByEmail = async function(email) {
-    try {
-        let user = await sequelize.query("select user_id, email from user where email = ?", { replacements: [email], type: sequelize.QueryTypes.SELECT })
-        console.log(user);
-        if (user && user[0]) {
-            return {
-                user_id: user.user_id
-
-            }
-        }
-    }
-    catch (err) {
-        console.log("Error in Database");
-    }
-    return null;
-
-}
-module.exports = User
+module.exports = Location

@@ -1,20 +1,32 @@
 const { Sequelize, sequelize } = require('../startup/db')
 // Sequalize Operator Comparision
 const Op = Sequelize.Op
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
-const config = require("../config/config")
 
-const User = sequelize.define('user', {
-    user_id: {
-        primaryKey: true,
-        type: Sequelize.UUID,
-
+const Car = sequelize.define('car', {
+    vin: {
+        type: Sequelize.STRING(255),
+        primaryKey: true
     },
-    name: Sequelize.STRING(30),
-    email: { type: Sequelize.STRING(50), isEmail: true, },
-    token: Sequelize.STRING(1000),
-    is_admin: Sequelize.INTEGER
+    make_id: {
+        type: Sequelize.UUID,
+        references: "make",
+        referencesKey: "make_id"
+    },
+    model_id: {
+        type: Sequelize.UUID,
+        references: "model",
+        referencesKey: "model_id"
+    },
+    year: Sequelize.year,
+    ecrgradeid: Sequelize.INTEGER(3),
+    mileage: Sequelize.INTEGER(8),
+    saleurl: Sequelize.STRING(500),
+    location_id: {
+        type: Sequelize.UUID,
+        references: "location",
+        referencesKey: "location_id"
+    },
+    createdate: Sequelize.Time
 }, {
     timestamps: false,
     underscored: true,
@@ -51,38 +63,4 @@ const User = sequelize.define('user', {
     // }
 })
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-
-
-User.prototype.generateAuthToken = function() {
-    const token = jwt.sign({
-            user_id: this.user_id,
-            name: this.name,
-            email: this.email,
-            is_admin: this.is_admin
-        },
-        config["secret"].jwtPrivateKey
-    );
-    return token;
-};
-
-User.findByEmail = async function(email) {
-    try {
-        let user = await sequelize.query("select user_id, email from user where email = ?", { replacements: [email], type: sequelize.QueryTypes.SELECT })
-        console.log(user);
-        if (user && user[0]) {
-            return {
-                user_id: user.user_id
-
-            }
-        }
-    }
-    catch (err) {
-        console.log("Error in Database");
-    }
-    return null;
-
-}
-module.exports = User
+module.exports = Car
