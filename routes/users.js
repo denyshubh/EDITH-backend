@@ -12,7 +12,7 @@ router.post("/", async(req, res) => {
     try {
         const salt = await bcrypt.genSalt(10);
         req.body["token"] = await bcrypt.hash(req.body.token, salt);
-        const user = await User.create(req.body, { fields: ['email', 'token', 'name', 'is_admin'] });
+        const user = await User.create(req.body, { fields: ['user_id', 'email', 'token', 'name', 'is_admin'] });
         console.log(JSON.stringify(user))
         const token = user.generateAuthToken();
         return res
